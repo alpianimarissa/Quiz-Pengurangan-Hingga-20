@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Pengurangan Ceria (Hingga 20)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f0fdf4;
+        }
+        
+        .font-kids {
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .bouncy {
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .number-line-item {
+            transition: all 0.3s ease;
+        }
+
+        .active-step {
+            background-color: #facc15 !important;
+            transform: scale(1.2);
+            border-color: #ca8a04 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .crossed-out {
+            position: relative;
+            opacity: 0.3;
+            transform: scale(0.85);
+            transition: all 0.3s ease;
+        }
+        
+        .crossed-out::after {
+            content: '❌';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            opacity: 1;
+        }
+
+        /* Custom scrollbar for horizontal number line */
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 10px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background: #4ade80;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen pb-12">
+
+    <!-- Header / Navbar -->
+    <header class="bg-amber-400 border-b-8 border-amber-500 p-4 text-center sticky top-0 z-50 shadow-md">
+        <h1 class="font-kids text-2xl md:text-4xl text-amber-900 drop-shadow-sm flex items-center justify-center gap-2">
+            <span>🦁</span> PETUALANGAN PENGURANGAN (1 - 20) <span>🐰</span>
+        </h1>
+        <p class="text-amber-900 font-bold text-xs md:text-sm mt-1">Belajar pengurangan jadi gampang dan seru!</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center gap-2 md:gap-4">
+            <button onclick="switchTab('konsep')" id="tab-konsep" class="tab-btn bg-emerald-500 hover:bg-emerald-600 text-white font-kids px-4 py-2 rounded-2xl shadow-lg transform transition active:scale-95 text-sm md:text-base border-b-4 border-emerald-700">
+                1. Konsep Coret 🍎
+            </button>
+            <button onclick="switchTab('garis')" id="tab-garis" class="tab-btn bg-sky-500 hover:bg-sky-600 text-white font-kids px-4 py-2 rounded-2xl shadow-lg transform transition active:scale-95 text-sm md:text-base border-b-4 border-sky-700">
+                2. Jalan Mundur 🐾
+            </button>
+            <button onclick="switchTab('jari')" id="tab-jari" class="tab-btn bg-purple-500 hover:bg-purple-600 text-white font-kids px-4 py-2 rounded-2xl shadow-lg transform transition active:scale-95 text-sm md:text-base border-b-4 border-purple-700">
+                3. Trik Jari & Simpan 🖐️
+            </button>
+            <button onclick="switchTab('kuis')" id="tab-kuis" class="tab-btn bg-rose-500 hover:bg-rose-600 text-white font-kids px-4 py-2 rounded-2xl shadow-lg transform transition active:scale-95 text-sm md:text-base border-b-4 border-rose-700">
+                4. Main Kuis 🌟
+            </button>
+        </div>
+
+        <!-- TAB 1: KONSEP CORET BENDA -->
+        <section id="sec-konsep" class="tab-content bg-white p-6 rounded-3xl shadow-xl border-4 border-emerald-300">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl bg-emerald-100 p-2 rounded-2xl">🍎</span>
+                <div>
+                    <h2 class="font-kids text-xl md:text-2xl text-emerald-600">1. Konsep Coret Benda (20 Latihan Soal)</h2>
+                    <p class="text-xs text-slate-500">Coret/klik buah sejumlah angka pengurang untuk menemukan sisanya!</p>
+                </div>
+            </div>
+
+            <!-- Quiz Navigation / Selector -->
+            <div class="flex items-center justify-between bg-emerald-50 p-3 rounded-2xl border border-emerald-200 mb-4">
+                <button onclick="changeCoreQuestion(-1)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-kids px-3 py-1 rounded-xl text-sm">⬅️ Soal Sebelah</button>
+                <div class="font-kids text-emerald-800 text-sm md:text-base">
+                    Soal <span id="coret-num" class="text-lg text-emerald-600">1</span> / 20
+                </div>
+                <button onclick="changeCoreQuestion(1)" class="bg-emerald-500 hover:bg-emerald-600 text-white font-kids px-3 py-1 rounded-xl text-sm">Soal Lanjut ➡️</button>
+            </div>
+
+            <!-- Interactive Demo Coret -->
+            <div class="bg-amber-50 p-4 md:p-6 rounded-2xl border-2 border-amber-200 mb-6 text-center">
+                <p class="text-sm text-slate-600 mb-1">Soal Coret Buah:</p>
+                <h3 id="coret-soal-text" class="font-kids text-3xl text-amber-900 mb-3">12 - 4 = ...</h3>
+                <p id="coret-instruction" class="text-xs md:text-sm text-emerald-700 font-bold mb-4">Klik/coret buah sebanyak 4 kali!</p>
+
+                <div id="apple-container" class="flex flex-wrap justify-center gap-2 md:gap-3 my-4 max-w-2xl mx-auto">
+                    <!-- Dynamic apples will be generated by JS -->
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-4 mt-4">
+                    <div class="p-3 bg-white rounded-xl shadow border border-amber-200">
+                        <p class="text-sm font-bold text-slate-700">
+                            Sisa Buah Utuh: <span id="apple-count" class="font-kids text-2xl text-emerald-600">12</span>
+                        </p>
+                    </div>
+                    <button onclick="resetCurrentCoreProblem()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs transition">
+                        🔄 Ulangi Soal Ini
+                    </button>
+                </div>
+
+                <!-- Multiple choice validation for this problem -->
+                <div class="mt-6 pt-4 border-t border-amber-200">
+                    <p class="text-xs font-bold text-slate-600 mb-2">PILIH JAWABAN YANG BENAR:</p>
+                    <div id="coret-options" class="flex flex-wrap justify-center gap-3">
+                        <!-- Options generated by JS -->
+                    </div>
+                    <div id="coret-feedback" class="font-kids text-sm mt-3 min-h-[24px]"></div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 p-4 rounded-2xl border-l-4 border-emerald-500 text-sm md:text-base text-emerald-900">
+                💡 <strong>Petunjuk Belajar:</strong> Hitung dulu seluruh benda di awal. Lalu coret benda sebanyak angka yang dikurangkan. Hitung benda yang tersisa (tidak dicoret)!
+            </div>
+        </section>
+
+        <!-- TAB 2: GARIS ANGKA (JALAN MUNDUR) -->
+        <section id="sec-garis" class="tab-content hidden bg-white p-6 rounded-3xl shadow-xl border-4 border-sky-300">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl bg-sky-100 p-2 rounded-2xl">🐰</span>
+                <div>
+                    <h2 class="font-kids text-xl md:text-2xl text-sky-600">2. Latihan Jalan Mundur (20 Latihan Soal)</h2>
+                    <p class="text-xs text-slate-500">Lompat mundur pada deretan angka untuk menemukan jawabannya!</p>
+                </div>
+            </div>
+
+            <!-- Quiz Navigation / Selector -->
+            <div class="flex items-center justify-between bg-sky-50 p-3 rounded-2xl border border-sky-200 mb-4">
+                <button onclick="changeGarisQuestion(-1)" class="bg-sky-500 hover:bg-sky-600 text-white font-kids px-3 py-1 rounded-xl text-sm">⬅️ Soal Sebelah</button>
+                <div class="font-kids text-sky-800 text-sm md:text-base">
+                    Soal <span id="garis-num" class="text-lg text-sky-600">1</span> / 20
+                </div>
+                <button onclick="changeGarisQuestion(1)" class="bg-sky-500 hover:bg-sky-600 text-white font-kids px-3 py-1 rounded-xl text-sm">Soal Lanjut ➡️</button>
+            </div>
+
+            <div class="bg-sky-50 p-4 md:p-6 rounded-2xl border-2 border-sky-200 mb-6">
+                <!-- Controls -->
+                <div class="text-center mb-4">
+                    <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Soal Aktif:</span>
+                    <div id="garis-soal-text" class="font-kids text-3xl text-sky-900 my-1">15 - 4 = ...</div>
+                    <p class="text-sm font-bold text-slate-700" id="step-info">Klik "Lompat Mundur" untuk melangkah!</p>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
+                    <button onclick="stepMundur()" class="bg-sky-500 hover:bg-sky-600 text-white font-kids px-5 py-2 rounded-xl shadow-md transform active:scale-95 text-base flex items-center gap-2">
+                        <span>🐾</span> Lompat Mundur 1 Langkah
+                    </button>
+                    <button onclick="initNumberLine()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-xl text-sm">
+                        🔄 Reset
+                    </button>
+                </div>
+
+                <!-- Visual Number Line -->
+                <div class="overflow-x-auto py-6 px-2">
+                    <div id="number-line" class="flex items-center min-w-[700px] justify-between relative px-4">
+                        <!-- Items rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Options selection -->
+                <div class="mt-4 pt-4 border-t border-sky-200 text-center">
+                    <p class="text-xs font-bold text-slate-600 mb-2">PILIH JAWABAN AKHIR:</p>
+                    <div id="garis-options" class="flex flex-wrap justify-center gap-3">
+                        <!-- Options generated by JS -->
+                    </div>
+                    <div id="garis-feedback" class="font-kids text-sm mt-3 min-h-[24px]"></div>
+                </div>
+            </div>
+
+            <div class="bg-sky-50 p-4 rounded-2xl border-l-4 border-sky-500 text-sm md:text-base text-sky-900">
+                ⭐ <strong>Ingat Aturannya:</strong> Mulai berdiri di angka depan, lalu lompat ke KIRI (mundur) sebanyak angka pengurangnya.
+            </div>
+        </section>
+
+        <!-- TAB 3: TRIK JARI & SIMPAN -->
+        <section id="sec-jari" class="tab-content hidden bg-white p-6 rounded-3xl shadow-xl border-4 border-purple-300">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="text-3xl bg-purple-100 p-2 rounded-2xl">🧠</span>
+                <div>
+                    <h2 class="font-kids text-xl md:text-2xl text-purple-600">3. Latihan Trik Jari (20 Latihan Soal)</h2>
+                    <p class="text-xs text-slate-500">Hitung mundur tanpa garis angka memakai ingatan & jari tangan!</p>
+                </div>
+            </div>
+
+            <!-- Quiz Navigation / Selector -->
+            <div class="flex items-center justify-between bg-purple-50 p-3 rounded-2xl border border-purple-200 mb-4">
+                <button onclick="changeJariQuestion(-1)" class="bg-purple-500 hover:bg-purple-600 text-white font-kids px-3 py-1 rounded-xl text-sm">⬅️ Soal Sebelah</button>
+                <div class="font-kids text-purple-800 text-sm md:text-base">
+                    Soal <span id="jari-num" class="text-lg text-purple-600">1</span> / 20
+                </div>
+                <button onclick="changeJariQuestion(1)" class="bg-purple-500 hover:bg-purple-600 text-white font-kids px-3 py-1 rounded-xl text-sm">Soal Lanjut ➡️</button>
+            </div>
+
+            <!-- Interactive Example Simulator -->
+            <div class="bg-purple-50 p-6 rounded-2xl border-2 border-purple-200 text-center">
+                <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Soal Trik Jari:</span>
+                <h3 id="jari-soal-text" class="font-kids text-3xl text-purple-900 mb-4">14 - 5 = ...</h3>
+                
+                <div class="flex flex-col items-center justify-center gap-4 my-2">
+                    <div id="jari-step-display" class="bg-white p-4 rounded-xl shadow-md border border-purple-200 max-w-md w-full min-h-[120px] flex flex-col items-center justify-center">
+                        <p class="text-base text-purple-900 font-bold" id="jari-instruction">Klik "Langkah Berikutnya" untuk mempraktikkan!</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="nextJariStep()" id="btn-jari-next" class="bg-purple-500 hover:bg-purple-600 text-white font-kids px-6 py-2 rounded-xl shadow-md transform active:scale-95 text-base">
+                            Langkah Berikutnya ➡️
+                        </button>
+                        <button onclick="resetJariSim()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-sm">
+                            🔄 Ulangi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Answer options -->
+                <div class="mt-6 pt-4 border-t border-purple-200">
+                    <p class="text-xs font-bold text-slate-600 mb-2">TEBAK HASIL MUNDUR SELESAI:</p>
+                    <div id="jari-options" class="flex flex-wrap justify-center gap-3">
+                        <!-- Options generated by JS -->
+                    </div>
+                    <div id="jari-feedback" class="font-kids text-sm mt-3 min-h-[24px]"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: KUIS INTERAKTIF / DRILL TAK TERBATAS -->
+        <section id="sec-kuis" class="tab-content hidden bg-white p-6 rounded-3xl shadow-xl border-4 border-rose-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl bg-rose-100 p-2 rounded-2xl">⚡</span>
+                    <div>
+                        <h2 class="font-kids text-xl md:text-2xl text-rose-600">4. Drill Soal Pengurangan (Tak Terbatas)</h2>
+                        <p class="text-xs text-slate-500">Latih Kecepatan & Ketelitian Tanpa Bantuan Visual!</p>
+                    </div>
+                </div>
+                <div class="bg-amber-100 border-2 border-amber-300 px-3 py-1 rounded-xl flex items-center gap-2">
+                    <span class="text-xl">🌟</span>
+                    <span id="score-display" class="font-kids text-amber-800 text-lg">Skor: 0</span>
+                </div>
+            </div>
+
+            <!-- Quiz Card -->
+            <div id="quiz-card" class="bg-rose-50 p-6 rounded-2xl border-2 border-rose-200 text-center max-w-xl mx-auto">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-500 mb-2">
+                    <span id="quiz-progress">Soal Ke-1</span>
+                    <span id="quiz-stats">Benar: 0 | Total: 0</span>
+                </div>
+                <div class="font-kids text-4xl text-slate-800 my-4" id="quiz-question">16 - 4 = ...</div>
+
+                <div class="grid grid-cols-2 gap-4 mt-6" id="quiz-options">
+                    <!-- Options generated by JS -->
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="quiz-feedback" class="mt-4 font-kids text-lg min-h-[30px]"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-500 text-xs mt-12">
+        <p>Media Pembelajaran Interaktif Matematika SD Kelas 1 • Didesain Khusus Anak-Anak</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Sound Effects using Web Audio API ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'pop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        // --- Helper: Option Generator ---
+        function generateOptions(correctAnswer) {
+            const options = new Set([correctAnswer]);
+            while (options.size < 4) {
+                let offset = (Math.floor(Math.random() * 5) + 1) * (Math.random() < 0.5 ? 1 : -1);
+                let wrong = correctAnswer + offset;
+                if (wrong >= 0 && wrong <= 20) {
+                    options.add(wrong);
+                }
+            }
+            return Array.from(options).sort(() => Math.random() - 0.5);
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tabName) {
+            playSound('pop');
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('ring-4', 'ring-amber-300');
+            });
+
+            document.getElementById(`sec-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.add('ring-4', 'ring-amber-300');
+        }
+
+        // ==========================================
+        // 20 SOAL DATA SETS FOR EACH METHOD
+        // ==========================================
+
+        // 1. DATA 20 SOAL CORET BUAH
+        const coretProblems = [
+            { a: 12, b: 4, fruit: '🍎' },
+            { a: 10, b: 3, fruit: '🍊' },
+            { a: 14, b: 5, fruit: '🍓' },
+            { a: 11, b: 2, fruit: '🍌' },
+            { a: 13, b: 6, fruit: '🍉' },
+            { a: 15, b: 4, fruit: '🍇' },
+            { a: 9,  b: 4, fruit: '🍎' },
+            { a: 16, b: 5, fruit: '🍊' },
+            { a: 8,  b: 3, fruit: '🍓' },
+            { a: 17, b: 6, fruit: '🍌' },
+            { a: 12, b: 5, fruit: '🍉' },
+            { a: 18, b: 7, fruit: '🍇' },
+            { a: 11, b: 4, fruit: '🍎' },
+            { a: 14, b: 6, fruit: '🍊' },
+            { a: 19, b: 8, fruit: '🍓' },
+            { a: 13, b: 5, fruit: '🍌' },
+            { a: 15, b: 7, fruit: '🍉' },
+            { a: 20, b: 9, fruit: '🍇' },
+            { a: 10, b: 6, fruit: '🍎' },
+            { a: 16, b: 8, fruit: '🍊' }
+        ];
+        let coretIdx = 0;
+        let currentApples = 0;
+        let crossedApples = 0;
+
+        function loadCoreQuestion() {
+            const prob = coretProblems[coretIdx];
+            document.getElementById('coret-num').innerText = coretIdx + 1;
+            document.getElementById('coret-soal-text').innerText = `${prob.a} - ${prob.b} = ...`;
+            document.getElementById('coret-instruction').innerText = `Klik/coret ${prob.fruit} sebanyak ${prob.b} kali!`;
+            document.getElementById('coret-feedback').innerText = '';
+
+            currentApples = prob.a;
+            crossedApples = 0;
+            updateAppleCount();
+
+            // Render fruits
+            const container = document.getElementById('apple-container');
+            container.innerHTML = '';
+            for (let i = 0; i < prob.a; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'text-3xl md:text-4xl p-2 bg-white rounded-2xl shadow hover:bg-amber-100 transition transform hover:scale-110';
+                btn.innerHTML = prob.fruit;
+                btn.onclick = () => crossApple(btn, prob.b);
+                container.appendChild(btn);
+            }
+
+            // Render options
+            const ans = prob.a - prob.b;
+            const opts = generateOptions(ans);
+            const optsContainer = document.getElementById('coret-options');
+            optsContainer.innerHTML = '';
+            opts.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'bg-white hover:bg-emerald-100 border-2 border-emerald-400 font-kids text-xl text-emerald-800 px-5 py-2 rounded-xl shadow transition active:scale-95';
+                b.innerText = opt;
+                b.onclick = () => checkCoreAnswer(opt, ans, b);
+                optsContainer.appendChild(b);
+            });
+        }
+
+        function crossApple(btn, maxCross) {
+            if (btn.classList.contains('crossed-out')) return;
+            if (crossedApples >= maxCross) {
+                return;
+            }
+
+            playSound('pop');
+            btn.classList.add('crossed-out');
+            crossedApples++;
+            currentApples--;
+            updateAppleCount();
+        }
+
+        function updateAppleCount() {
+            document.getElementById('apple-count').innerText = currentApples;
+        }
+
+        function resetCurrentCoreProblem() {
+            playSound('pop');
+            loadCoreQuestion();
+        }
+
+        function changeCoreQuestion(dir) {
+            playSound('pop');
+            coretIdx += dir;
+            if (coretIdx < 0) coretIdx = coretProblems.length - 1;
+            if (coretIdx >= coretProblems.length) coretIdx = 0;
+            loadCoreQuestion();
+        }
+
+        function checkCoreAnswer(selected, correct, btn) {
+            const feedback = document.getElementById('coret-feedback');
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerHTML = `<span class="text-emerald-600">✅ BENAR! Sisanya adalah ${correct}! 🎉</span>`;
+            } else {
+                playSound('wrong');
+                feedback.innerHTML = `<span class="text-rose-600">❌ Kurang tepat, coba hitung lagi sisa buahnya!</span>`;
+            }
+        }
+
+
+        // 2. DATA 20 SOAL GARIS ANGKA (JALAN MUNDUR)
+        const garisProblems = [
+            { a: 15, b: 4 }, { a: 18, b: 5 }, { a: 12, b: 6 }, { a: 20, b: 7 },
+            { a: 14, b: 3 }, { a: 16, b: 4 }, { a: 11, b: 5 }, { a: 13, b: 4 },
+            { a: 17, b: 5 }, { a: 19, b: 6 }, { a: 10, b: 4 }, { a: 15, b: 7 },
+            { a: 18, b: 8 }, { a: 12, b: 5 }, { a: 14, b: 6 }, { a: 20, b: 5 },
+            { a: 13, b: 7 }, { a: 16, b: 7 }, { a: 17, b: 8 }, { a: 19, b: 9 }
+        ];
+        let garisIdx = 0;
+        let lineStart = 15;
+        let lineSub = 4;
+        let currentPos = 15;
+        let stepsTaken = 0;
+
+        function loadGarisQuestion() {
+            const prob = garisProblems[garisIdx];
+            document.getElementById('garis-num').innerText = garisIdx + 1;
+            document.getElementById('garis-soal-text').innerText = `${prob.a} - ${prob.b} = ...`;
+            document.getElementById('garis-feedback').innerText = '';
+
+            lineStart = prob.a;
+            lineSub = prob.b;
+            currentPos = lineStart;
+            stepsTaken = 0;
+
+            document.getElementById('step-info').innerHTML = `Berdiri di angka <span class="text-sky-600 font-kids text-xl">${lineStart}</span>. Siap lompat <span class="text-rose-500 font-kids text-xl">${lineSub}</span> langkah mundur!`;
+
+            renderNumberLine();
+
+            // Options
+            const ans = prob.a - prob.b;
+            const opts = generateOptions(ans);
+            const optsContainer = document.getElementById('garis-options');
+            optsContainer.innerHTML = '';
+            opts.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'bg-white hover:bg-sky-100 border-2 border-sky-400 font-kids text-xl text-sky-800 px-5 py-2 rounded-xl shadow transition active:scale-95';
+                b.innerText = opt;
+                b.onclick = () => checkGarisAnswer(opt, ans);
+                optsContainer.appendChild(b);
+            });
+        }
+
+        function changeGarisQuestion(dir) {
+            playSound('pop');
+            garisIdx += dir;
+            if (garisIdx < 0) garisIdx = garisProblems.length - 1;
+            if (garisIdx >= garisProblems.length) garisIdx = 0;
+            loadGarisQuestion();
+        }
+
+        function initNumberLine() {
+            loadGarisQuestion();
+        }
+
+        function renderNumberLine() {
+            const container = document.getElementById('number-line');
+            container.innerHTML = '';
+
+            const minNum = Math.max(0, lineStart - lineSub - 2);
+            const maxNum = Math.min(20, lineStart + 2);
+
+            for (let i = minNum; i <= maxNum; i++) {
+                const item = document.createElement('div');
+                item.className = 'flex flex-col items-center relative z-10';
+
+                const numCircle = document.createElement('div');
+                numCircle.id = `num-${i}`;
+                numCircle.className = `number-line-item w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-sky-400 bg-white font-kids text-lg flex items-center justify-center text-sky-800 shadow`;
+                numCircle.innerText = i;
+
+                if (i === currentPos) {
+                    numCircle.classList.add('active-step');
+                    const rabbit = document.createElement('div');
+                    rabbit.className = 'absolute -top-8 text-2xl bouncy';
+                    rabbit.innerText = '🐰';
+                    item.appendChild(rabbit);
+                }
+
+                item.appendChild(numCircle);
+                container.appendChild(item);
+            }
+        }
+
+        function stepMundur() {
+            if (stepsTaken < lineSub) {
+                playSound('pop');
+                currentPos--;
+                stepsTaken++;
+                renderNumberLine();
+
+                const remaining = lineSub - stepsTaken;
+                if (remaining > 0) {
+                    document.getElementById('step-info').innerHTML = `Mundur ke <span class="text-sky-600 font-kids text-2xl">${currentPos}</span>! Sisa <span class="text-rose-500 font-kids text-2xl">${remaining}</span> lompatan lagi.`;
+                } else {
+                    document.getElementById('step-info').innerHTML = `🎉 SELESAI! Kelinci berhenti di angka <span class="text-emerald-600 font-kids text-2xl">${currentPos}</span>!`;
+                    playSound('correct');
+                }
+            }
+        }
+
+        function checkGarisAnswer(selected, correct) {
+            const feedback = document.getElementById('garis-feedback');
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerHTML = `<span class="text-emerald-600">✅ BENAR! Hasil dari ${lineStart} - ${lineSub} adalah ${correct}! 🌟</span>`;
+            } else {
+                playSound('wrong');
+                feedback.innerHTML = `<span class="text-rose-600">❌ Belum tepat. Coba selesaikan lompatan kelinci sampai akhir!</span>`;
+            }
+        }
+
+
+        // 3. DATA 20 SOAL TRIK JARI & SIMPAN
+        const jariProblems = [
+            { a: 14, b: 5 }, { a: 12, b: 4 }, { a: 15, b: 6 }, { a: 11, b: 3 },
+            { a: 13, b: 5 }, { a: 16, b: 7 }, { a: 10, b: 4 }, { a: 17, b: 5 },
+            { a: 18, b: 6 }, { a: 12, b: 5 }, { a: 14, b: 7 }, { a: 15, b: 8 },
+            { a: 13, b: 6 }, { a: 19, b: 7 }, { a: 11, b: 5 }, { a: 16, b: 8 },
+            { a: 20, b: 6 }, { a: 17, b: 9 }, { a: 18, b: 9 }, { a: 15, b: 9 }
+        ];
+        let jariIdx = 0;
+        let jariStep = 0;
+        let currentJariInstructions = [];
+
+        function generateJariSteps(a, b) {
+            const steps = [
+                { text: `Soal: <strong>${a} - ${b}</strong><br>Simpan angka <strong>${a}</strong> di dalam kepala! 🧠`, icon: "🧠" },
+                { text: `Angka pengurangnya adalah <strong>${b}</strong>.<br>Buka <strong>${b} jari tanganmu</strong>! 🖐️`, icon: "🖐️" }
+            ];
+
+            let curr = a;
+            for (let i = 1; i <= b; i++) {
+                curr--;
+                steps.push({
+                    text: `Lipat jari ke-${i}:<br>Hitung mundur sebut: <span class='text-purple-600 font-kids text-2xl'>'${curr}'</span>`,
+                    icon: `${i}️⃣`
+                });
+            }
+
+            steps.push({
+                text: `✨ Jari selesai dilipat!<br>Angka terakhir diucapkan adalah <strong>${a - b}</strong>.<br>Jadi, <span class='text-emerald-600 font-kids text-2xl'>${a} - ${b} = ${a - b}</span> 🎉`,
+                icon: "🏆"
+            });
+
+            return steps;
+        }
+
+        function loadJariQuestion() {
+            const prob = jariProblems[jariIdx];
+            document.getElementById('jari-num').innerText = jariIdx + 1;
+            document.getElementById('jari-soal-text').innerText = `${prob.a} - ${prob.b} = ...`;
+            document.getElementById('jari-feedback').innerText = '';
+
+            jariStep = 0;
+            currentJariInstructions = generateJariSteps(prob.a, prob.b);
+            updateJariDisplay();
+
+            // Options
+            const ans = prob.a - prob.b;
+            const opts = generateOptions(ans);
+            const optsContainer = document.getElementById('jari-options');
+            optsContainer.innerHTML = '';
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-white hover:bg-purple-100 border-2 border-purple-400 font-kids text-xl text-purple-800 px-5 py-2 rounded-xl shadow transition active:scale-95';
+                btn.innerText = opt;
+                btn.onclick = () => checkJariAnswer(opt, ans);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function changeJariQuestion(dir) {
+            playSound('pop');
+            jariIdx += dir;
+            if (jariIdx < 0) jariIdx = jariProblems.length - 1;
+            if (jariIdx >= jariProblems.length) jariIdx = 0;
+            loadJariQuestion();
+        }
+
+        function nextJariStep() {
+            playSound('pop');
+            if (jariStep < currentJariInstructions.length - 1) {
+                jariStep++;
+            } else {
+                jariStep = 0;
+            }
+            updateJariDisplay();
+        }
+
+        function resetJariSim() {
+            playSound('pop');
+            jariStep = 0;
+            updateJariDisplay();
+        }
+
+        function updateJariDisplay() {
+            const info = currentJariInstructions[jariStep];
+            document.getElementById('jari-instruction').innerHTML = `
+                <div class="text-4xl mb-2">${info.icon}</div>
+                <div>${info.text}</div>
+            `;
+            const btn = document.getElementById('btn-jari-next');
+            if (jariStep === currentJariInstructions.length - 1) {
+                btn.innerText = "🔄 Ulangi Langkah";
+            } else {
+                btn.innerText = "Langkah Berikutnya ➡️";
+            }
+        }
+
+        function checkJariAnswer(selected, correct) {
+            const feedback = document.getElementById('jari-feedback');
+            if (selected === correct) {
+                playSound('correct');
+                feedback.innerHTML = `<span class="text-emerald-600">✅ BENAR! Hasilnya adalah ${correct}! ✨</span>`;
+            } else {
+                playSound('wrong');
+                feedback.innerHTML = `<span class="text-rose-600">❌ Kurang tepat, ikuti langkah hitung mundur dengan jari di atas!</span>`;
+            }
+        }
+
+
+        // 4. KUIS DRILLING TAK TERBATAS (UNLIMITED DRILL)
+        let totalAnswered = 0;
+        let totalCorrect = 0;
+        let score = 0;
+        let currentDrillA = 0;
+        let currentDrillB = 0;
+
+        function loadDrillQuestion() {
+            // Generate random subtraction up to 20
+            currentDrillA = Math.floor(Math.random() * 16) + 5; // 5 to 20
+            currentDrillB = Math.floor(Math.random() * (currentDrillA - 1)) + 1; // 1 to A-1
+            const correctAns = currentDrillA - currentDrillB;
+
+            document.getElementById('quiz-progress').innerText = `Soal Ke-${totalAnswered + 1}`;
+            document.getElementById('quiz-stats').innerText = `Benar: ${totalCorrect} | Total: ${totalAnswered}`;
+            document.getElementById('quiz-question').innerText = `${currentDrillA} - ${currentDrillB} = ...`;
+            document.getElementById('quiz-feedback').innerText = '';
+
+            const opts = generateOptions(correctAns);
+            const container = document.getElementById('quiz-options');
+            container.innerHTML = '';
+
+            opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-white hover:bg-rose-100 border-2 border-rose-300 font-kids text-2xl text-rose-800 py-3 rounded-2xl shadow transition transform active:scale-95';
+                btn.innerText = opt;
+                btn.onclick = () => checkDrillAnswer(opt, correctAns, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkDrillAnswer(selected, correct, btn) {
+            const feedback = document.getElementById('quiz-feedback');
+            const allBtns = document.querySelectorAll('#quiz-options button');
+            allBtns.forEach(b => b.disabled = true);
+
+            totalAnswered++;
+
+            if (selected === correct) {
+                playSound('correct');
+                totalCorrect++;
+                score += 10;
+                btn.classList.add('bg-emerald-400', 'text-white', 'border-emerald-500');
+                feedback.innerHTML = "<span class='text-emerald-600'>✅ Hore! Benar Sekali! 🌟</span>";
+            } else {
+                playSound('wrong');
+                btn.classList.add('bg-rose-400', 'text-white', 'border-rose-500');
+                feedback.innerHTML = `<span class='text-rose-600'>❌ Jawabannya adalah ${correct}! Semangat lagi!</span>`;
+            }
+
+            document.getElementById('score-display').innerText = `Skor: ${score}`;
+
+            setTimeout(() => {
+                loadDrillQuestion();
+            }, 1400);
+        }
+
+
+        // Initialize On Load
+        window.onload = function() {
+            loadCoreQuestion();
+            loadGarisQuestion();
+            loadJariQuestion();
+            loadDrillQuestion();
+            document.getElementById('tab-konsep').classList.add('ring-4', 'ring-amber-300');
+        };
+    </script>
+</body>
+</html>
